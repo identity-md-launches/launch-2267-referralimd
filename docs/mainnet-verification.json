@@ -1,0 +1,26 @@
+{
+  "observedDate": "2026-10-19",
+  "chainId": 1,
+  "blockNumber": 26229338,
+  "rewardToken": "0xD34a99Bc0f67aE1bbd63C660e6d0b0dd03E263B7",
+  "name": "Identity.md",
+  "symbol": "IMD",
+  "decimals": 18,
+  "runtimeBytes": 22990,
+  "runtimeKeccak256": "0x79a1ae149d27d4aae006d4dd75cb834222c9623799bbf34359428aaf66fec3bf",
+  "externalTokenOwner": "0x047f606fd5b2baa5f5c6c4ab8958e45cb6b054b7",
+  "publicRpc": "https://ethereum-rpc.publicnode.com",
+  "verifiedSourceUrl": "https://eth.blockscout.com/api/v2/smart-contracts/0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7",
+  "tokenMetadataUrl": "https://eth.blockscout.com/api/v2/tokens/0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7",
+  "sourceContractName": "BridgedFP",
+  "sourceCompiler": "v0.8.26+commit.8a97fa7a",
+  "rpcRuntimeMatchesVerifiedSource": true,
+  "forkRehearsal": {
+    "testsPassed": 2,
+    "testsFailed": 0,
+    "syntheticFunding": true,
+    "poolPrice": "one-to-one",
+    "productionFactoryRehearsed": false,
+    "broadcast": false
+  }
+}
