@@ -39,6 +39,8 @@ contract AdversarialRewardToken is ERC20 {
     }
 }
 
+contract DeadEndHolder {}
+
 contract RewardsTest is Test, IUnlockCallback {
     PoolManager private manager;
     ReferralIMD private token;
@@ -73,6 +75,20 @@ contract RewardsTest is Test, IUnlockCallback {
         reward.mint(address(this), amount);
         manager.unlock(abi.encode(amount));
         distributor.recordFee(amount);
+    }
+
+    function test_contractHolderMustClaimItself() public {
+        DeadEndHolder custodian = new DeadEndHolder();
+        token.transfer(address(custodian), 100);
+        vm.roll(1001);
+        _fee(100);
+        vm.roll(1002);
+        vm.expectRevert(RewardDistributor.ContractMustClaimItself.selector);
+        distributor.claimFor(address(custodian), 64);
+        assertEq(reward.balanceOf(address(custodian)), 0);
+        vm.prank(address(custodian));
+        assertEq(distributor.claim(64), 100);
+        assertEq(reward.balanceOf(address(custodian)), 100);
     }
 
     function test_oneBlockLagAndLateCheckpointAfterClaim() public {

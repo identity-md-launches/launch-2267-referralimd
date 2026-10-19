@@ -113,6 +113,12 @@ There are **no owner-settable settings** and no required keeper. The launch oper
 
 Positive-payout claims must run outside a currently unlocked PoolManager session. A failing IMD transfer reverts the payout and accounting together, leaving the holder able to retry. IMD is an external bridged asset with its own administration and bridge risk; immutability of these contracts does not remove that asset risk. Do not send tokens or ERC-6909 claims directly to the distributor: unsolicited transfers are not registered trading rewards and there is no rescue function.
 
+### Custodial holders (launch requirement)
+
+Eligibility is literal custody: every RIMD holder except the pool/PoolManager, burn address, hook and distributor earns. A contract holder (the swarm's MerkleDistributor holding the 10% allocation, the launch factory, exchange wallets, other AMM pairs) keeps accruing IMD while it holds RIMD. `claimFor` refuses to pay a contract account unless that contract itself calls `claim`, so nobody can push IMD into a contract that cannot move it; its entitlement stays as an ERC-6909 claim in the distributor until it claims. The contracts are immutable and have no exclusion setter or rescue path, so **before launch the operator must ensure every custodian of RIMD either can call `distributor.claim(64)` and forward IMD, or accepts that its accrued share stays unclaimed** (and still counts in the denominator, diluting wallets until the RIMD leaves it). In particular the swarm's 10% should reach holders promptly; while the MerkleDistributor holds it, that share of fees is not paid to wallets.
+
+Known, accepted limitations: fees from the launch block (zero eligible supply at the prior block) are held as `pendingFees` and weighted by the first later non-zero snapshot, which includes launch-block buyers; dust transfers can add one checkpoint per block to a holder's history, needing extra bounded `claim` calls (entitlement never lost); and the 2% levy applies only to the hooked launch pool, so a hookless RIMD/IMD pool on the same PoolManager is fee-free.
+
 ## Verification and reviews
 
 All required dependencies are pinned and vendored as ordinary source files under `lib/`; see [dependency versions and licenses](lib/DEPENDENCIES.md). Default compilation and tests need no network, RPC endpoint, key, environment configuration, FFI or filesystem permissions. The compiler is pinned to `0.8.26`, EVM Cancun, optimizer 200 runs, and `bytecode_hash = "none"`.

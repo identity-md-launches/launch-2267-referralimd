@@ -44,6 +44,7 @@ contract RewardDistributor is IUnlockCallback, ReentrancyGuard {
     error InvalidCallback();
     error ExcludedAccount();
     error InvalidBatch();
+    error ContractMustClaimItself();
 
     event FeesRecorded(uint256 indexed atBlock, uint256 amount);
     event Distributed(uint256 indexed atBlock, uint256 amount, uint256 eligibleSupply, uint256 index);
@@ -157,10 +158,12 @@ contract RewardDistributor is IUnlockCallback, ReentrancyGuard {
         return claimFor(msg.sender, maxIntervals);
     }
 
-    /// @notice Anyone can pay claim gas; IMD always goes to the entitled account.
+    /// @notice Anyone can pay claim gas for a wallet; IMD always goes to the entitled account. A contract
+    /// account must claim itself, so nobody can push IMD into a custodian that has no way to move it.
     function claimFor(address account, uint256 maxIntervals) public nonReentrant returns (uint256 amount) {
         Account memory progress;
         (amount, progress) = previewClaim(account, maxIntervals);
+        if (msg.sender != account && account.code.length != 0) revert ContractMustClaimItself();
         accounts[account] = progress;
         if (amount != 0) {
             totalClaimed += amount;
