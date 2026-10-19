@@ -1,0 +1,32 @@
+{
+  "kind": "univ4_hook",
+  "hook": {
+    "contract": "ReferralHook",
+    "constructorArgs": [
+      "$poolManager",
+      "$token",
+      "0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7",
+      "$factory"
+    ],
+    "permissions": [
+      "beforeInitialize",
+      "beforeSwap",
+      "afterSwap",
+      "beforeSwapReturnDelta",
+      "afterSwapReturnDelta"
+    ]
+  },
+  "token": {
+    "contract": "ReferralIMD",
+    "name": "ReferralIMD",
+    "symbol": "RIMD",
+    "decimals": 18
+  },
+  "pool": {
+    "pairedCurrency": "0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7",
+    "fee": 12500,
+    "tickSpacing": 60,
+    "initialPrice": "79228162514264337593543950336"
+  },
+  "notes": "ReferralIMD has no constructor arguments and no owner, admin, upgrade, post-deployment mint, pause, blacklist or transfer tax. ReferralHook binds this token/IMD pool, fee 12500 and tick spacing 60; beforeInitialize requires the configured PoolManager as caller and $factory as sender. All enabled swap callbacks also require PoolManager. The five permissions encode address bits 0x20cc, validated by the constructor. The hook charges 2% of the gross IMD side on buys and sells, in addition to the mandatory 1.25% LP fee and any Uniswap protocol fee. Gross-side fees round down; net-side gross-ups round up. Specified-IMD partial fills revert atomically. Fees are already in the requested IMD reward asset, so no conversion or RIMD fallback is used. ReferralHook creates one immutable RewardDistributor in its constructor; its address is available from distributor(), with manager, token, IMD and hook bound at construction. Each fee mints matching PoolManager ERC6909 IMD claims to that distributor, avoiding an immediate transfer before swap settlement. Rewards accrue pro rata to every eligible address using balances at the end of the preceding block, with no holder ranking or minimum balance. All RIMD held by PoolManager, the conventional burn address, the hook and its distributor is excluded; the zero address is also ineligible. Other custody contracts remain eligible and must support recovering IMD paid to them. Anyone may call distribute() or claimFor(account, maxIntervals); claim(maxIntervals) pays the caller's own entitlement. Claims always pay the entitled account in IMD, process at most 64 balance intervals and exclude current-block rewards. Checkpoint cursors prevent double claims, account fractions carry forward, and conservative rounding dust remains backed without an admin withdrawal. Fees wait when eligible supply is zero. poolKey() exposes sorted currencies and pool parameters. initialPrice records the required reference value; the launch policy determines the actual opening price. Supply and allocations are governed separately by launch policy. This manifest records the implementation; full swarm approval, deployment addresses and transaction hashes require the subsequent review and deployment steps."
+}
